@@ -1,0 +1,80 @@
+.pokeModals {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+.modalContainer {
+  cursor: auto;
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: 0px 0px 5px rgba(255, 255, 255, 0.4);
+  padding: 20px;
+  border-radius: 20px;
+  min-height: 350px;
+  min-width: 600px;
+  text-align: center;
+}
+.name {
+  text-align: center;
+  font-size: 35px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 5px;
+}
+.card {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  position: relative;
+  flex-wrap: wrap;
+}
+.modalImg {
+  width: 200px;
+  height: 200px;
+}
+.modalImg img {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.5));
+}
+.modalContent {
+  height: 220px;
+  width: 240px;
+}
+.modalContent tbody tr td:first-child {
+  text-transform: capitalize;
+  font-size: 16px;
+  text-align: left;
+}
+.modalContent tbody tr td:last-child {
+  padding-left: 10px;
+}
+
+progress::-webkit-progress-bar {
+  background-color: #c9c9c9;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.progress.one::-webkit-progress-value {
+  background-color: rgba(255, 0, 0, 0.9);
+}
+.progress.two::-webkit-progress-value {
+  background-color: rgba(255, 166, 0, 0.9);
+}
+.progress.three::-webkit-progress-value {
+  background-color: rgba(255, 255, 0, 0.9);
+}
+.progress.four::-webkit-progress-value {
+  background-color: rgba(153, 205, 50, 0.9);
+}
+.progress.five::-webkit-progress-value {
+  background-color: rgba(0, 128, 0, 0.9);
+}
