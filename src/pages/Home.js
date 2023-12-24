@@ -26,6 +26,7 @@ const Home = () => {
   const [chosenPokemon, setChosenPokemon] = useState(null);
   const [page, setPage] = useState(1);
   const [text, setText] = useState("");
+  const [error, setError] = useState(false);
 
   const {
     token: { colorBgContainer, borderRadiusLG },
@@ -44,16 +45,28 @@ const Home = () => {
       res = await fetch(
         `https://pokeapi.co/api/v2/pokemon/${q[1].toLowerCase()}`
       );
-      data = await res.json();
-      setAllPokemon([{ name: data.forms[0].name, url: data.forms[0].url }]);
+      if (res.status === 404) setError(true);
+      else {
+        setError(false);
+        data = await res.json();
+        setAllPokemon([{ name: data.forms[0].name, url: data.forms[0].url }]);
+      }
     } else if (q[0] === "type") {
       res = await fetch(`https://pokeapi.co/api/v2/type/${q[1]}`);
-      data = await res.json();
-      setAllPokemon(data.pokemon.map((poke) => poke.pokemon));
+      if (res.status === 404) setError(true);
+      else {
+        setError(false);
+        data = await res.json();
+        setAllPokemon(data.pokemon.map((poke) => poke.pokemon));
+      }
     } else {
       res = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${40 * page}`);
-      data = await res.json();
-      setAllPokemon(data.results);
+      if (res.status === 404) setError(true);
+      else {
+        setError(false);
+        data = await res.json();
+        setAllPokemon(data.results);
+      }
     }
     setLoading(false);
   };
@@ -171,17 +184,30 @@ const Home = () => {
           </Flex>
         </Header>
         <Content className={styles.Content}>
-          <div
-            className={styles.cardSection}
-            style={{
-              background: colorBgContainer,
-              borderradius: borderRadiusLG,
-            }}
-          >
-            {allPokemon?.map((pokemon) => (
-              <PokeCards key={pokemon.name} url={pokemon.url} />
-            ))}
-          </div>
+          {error ? (
+            <h1
+              style={{
+                fontSize: "30px",
+                textAlign: "center",
+                padding: "20px",
+                fontWeight: "700",
+              }}
+            >
+              Not Found
+            </h1>
+          ) : (
+            <div
+              className={styles.cardSection}
+              style={{
+                background: colorBgContainer,
+                borderradius: borderRadiusLG,
+              }}
+            >
+              {allPokemon?.map((pokemon) => (
+                <PokeCards key={pokemon.name} url={pokemon.url} />
+              ))}
+            </div>
+          )}
           {loading && <Spin tip="Loading..." />}
         </Content>
         <Footer style={{ textAlign: "center" }}>
