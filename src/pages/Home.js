@@ -116,9 +116,6 @@ const Home = () => {
     return () => window.removeEventListener("scroll", handleInfinteScroll);
   }, [page]);
 
-  // useEffect(() => {
-  // }, []);
-
   useEffect(() => {
     getPokemons();
   }, [text]);

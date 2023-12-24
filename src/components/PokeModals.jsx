@@ -34,9 +34,11 @@ const PokeModals = () => {
 
   return (
     <Badge.Ribbon text={fourDigitId(chosenPokemon)}>
-      <Modal open={modalScreen} onCancel={() => setModalScreen(false)}>
-        {/* <div className={styles.pokeModals} onClick={() => setModalScreen(false)}> */}
-        {/* <div className={styles.modalContainer}> */}
+      <Modal
+        open={modalScreen}
+        footer={null}
+        onCancel={() => setModalScreen(false)}
+      >
         {loading ? (
           <Skeleton active={true} />
         ) : (
@@ -89,8 +91,6 @@ const PokeModals = () => {
                 </tbody>
               </table>
             </div>
-            {/* </div> */}
-            {/* </div> */}
           </>
         )}
       </Modal>
