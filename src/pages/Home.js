@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useDebugValue, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Input,
   Layout,
@@ -7,7 +7,6 @@ import {
   Dropdown,
   Space,
   Typography,
-  Alert,
   Spin,
   Flex,
 } from "antd";
@@ -26,30 +25,36 @@ const Home = () => {
   const [modalScreen, setModalScreen] = useState(false);
   const [chosenPokemon, setChosenPokemon] = useState(null);
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState(null);
-  const [pokeType, setPokeType] = useState("all");
+  const [text, setText] = useState("");
 
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
-  const onSearch = (value, _e, info) => setSearch(value);
+  const onSearch = (value, _e, info) => {
+    value === "" ? setText("") : setText(`search/${value}`);
+  };
 
   const getPokemons = async () => {
     setLoading(true);
-    const res = await fetch(
-      `https://pokeapi.co/api/v2/pokemon?limit=${40 * page}`
-    );
-    const data = await res.json();
-    setAllPokemon(data.results);
-    setLoading(false);
-  };
-
-  const searchSinglePokemon = async () => {
-    setLoading(true);
-    const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${search}`);
-    const data = await res.json();
-    setAllPokemon([data]);
+    const q = text?.split("/");
+    let res;
+    let data;
+    if (q[0] === "search") {
+      res = await fetch(
+        `https://pokeapi.co/api/v2/pokemon/${q[1].toLowerCase()}`
+      );
+      data = await res.json();
+      setAllPokemon([{ name: data.forms[0].name, url: data.forms[0].url }]);
+    } else if (q[0] === "type") {
+      res = await fetch(`https://pokeapi.co/api/v2/type/${q[1]}`);
+      data = await res.json();
+      setAllPokemon(data.pokemon.map((poke) => poke.pokemon));
+    } else {
+      res = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${40 * page}`);
+      data = await res.json();
+      setAllPokemon(data.results);
+    }
     setLoading(false);
   };
 
@@ -79,34 +84,31 @@ const Home = () => {
 
   const handleInfinteScroll = () => {
     if (
-      window.innerHeight + document.documentElement.scrollTop + 5 >=
-      document.documentElement.offsetHeight
+      text === "" &&
+      window.innerHeight + document.documentElement.scrollTop + 1 >=
+        document.documentElement.offsetHeight
     ) {
       setPage((prev) => prev + 1);
     }
   };
 
   const handlePokeTypes = async (e) => {
-    const { key } = e;
-    if (key === "all") {
-      getPokemons();
-    } else {
-      setPokeType(key);
-      setLoading(true);
-      const res = await fetch(`https://pokeapi.co/api/v2/type/${e.key}`);
-      const data = await res.json();
-      setAllPokemon(data.pokemon.map((poke) => poke.pokemon));
-      setLoading(false);
-    }
+    if (e.key === "all") setText("");
+    else setText(`type/${e.key}`);
   };
 
   useEffect(() => {
-    if (pokeType === "all") {
-      getPokemons();
-    }
+    getPokemons();
     window.addEventListener("scroll", handleInfinteScroll);
     return () => window.removeEventListener("scroll", handleInfinteScroll);
-  }, [page, pokeType]);
+  }, [page]);
+
+  // useEffect(() => {
+  // }, []);
+
+  useEffect(() => {
+    getPokemons();
+  }, [text]);
 
   useEffect(() => {
     if (chosenPokemon) {

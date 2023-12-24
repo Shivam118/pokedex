@@ -59,24 +59,30 @@ const PokeCards = ({ url }) => {
         <img src={bgLogo} alt="pokeLogo" />
       </span>
       <div className={styles.cardContent}>
-        <h4 className={styles.name}>{pokemonData.name}</h4>
-        <div className={styles.pokeTypePills}>
-          {pokeTypes?.length > 0 &&
-            pokeTypes?.map((type) => {
-              return (
-                <span
-                  className={styles.pokeTypePill}
-                  style={{
-                    backgroundColor: colorTypes.filter(
-                      (val) => type === val.name
-                    )[0].color,
-                  }}
-                >
-                  {type}
-                </span>
-              );
-            })}
-        </div>
+        {loading ? (
+          <Skeleton active={true} />
+        ) : (
+          <>
+            <h4 className={styles.name}>{pokemonData.name}</h4>
+            <div className={styles.pokeTypePills}>
+              {pokeTypes?.length > 0 &&
+                pokeTypes?.map((type) => {
+                  return (
+                    <span
+                      className={styles.pokeTypePill}
+                      style={{
+                        backgroundColor: colorTypes.filter(
+                          (val) => type === val.name
+                        )[0].color,
+                      }}
+                    >
+                      {type}
+                    </span>
+                  );
+                })}
+            </div>
+          </>
+        )}
       </div>
       <div className={styles.cardImg}>
         {imgLoading && <Skeleton.Image active={true} />}
