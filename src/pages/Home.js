@@ -26,39 +26,7 @@ const Home = () => {
   const [chosenPokemon, setChosenPokemon] = useState(null);
   const [page, setPage] = useState(1);
   const [error, setError] = useState(false);
-  const [isInfinite, setIsInfinite] = useState(true);
-
-  const {
-    token: { colorBgContainer, borderRadiusLG },
-  } = theme.useToken();
-
-  const onSearch = async (value, _e, info) => {
-    if (value) {
-      setIsInfinite(false);
-      setLoading(true);
-      const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${value}`);
-      if (res.status === 404) setError(true);
-      else {
-        setError(false);
-        const data = await res.json();
-        setAllPokemon([{ name: data.forms[0].name, url: data.forms[0].url }]);
-      }
-      setLoading(false);
-    } else {
-      getPokemons();
-    }
-  };
-
-  const getPokemons = async () => {
-    setLoading(true);
-    setIsInfinite(true);
-    const res = await fetch(
-      `https://pokeapi.co/api/v2/pokemon?limit=${40 * page}`
-    );
-    const data = await res.json();
-    setAllPokemon(data.results);
-    setLoading(false);
-  };
+  const [search, setSearch] = useState("");
 
   const dropdownItems = [
     { key: "all", label: "All" },
@@ -84,8 +52,45 @@ const Home = () => {
     { key: "shadow", label: "Shadow" },
   ];
 
+  const {
+    token: { colorBgContainer, borderRadiusLG },
+  } = theme.useToken();
+
+  const onSearch = async (value, _e, info) => {
+    if (value) {
+      setSearch(`search/${value}`);
+    } else {
+      setPage(1);
+      setSearch("");
+      getPokemons();
+    }
+  };
+
+  const getPokemons = async () => {
+    const q = search.split("/");
+    let res, data;
+    setLoading(true);
+    if (q[0] === "search") {
+      res = await fetch(`https://pokeapi.co/api/v2/pokemon/${q[1]}`);
+      if (res.status === 404) setError(true);
+      else {
+        setError(false);
+        data = await res.json();
+        setAllPokemon([{ name: data.forms[0].name, url: data.forms[0].url }]);
+      }
+    } else if (q[0] === "type") {
+      res = await fetch(`https://pokeapi.co/api/v2/type/${q[1]}`);
+      const data = await res.json();
+      setAllPokemon(data.pokemon.map((poke) => poke.pokemon));
+    } else {
+      res = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${40 * page}`);
+      data = await res.json();
+      setAllPokemon(data.results);
+    }
+    setLoading(false);
+  };
+
   const handleInfinteScroll = () => {
-    if (!isInfinite) return;
     const bottom =
       window.innerHeight + document.documentElement.scrollTop + 1 >=
       document.documentElement.offsetHeight;
@@ -97,24 +102,23 @@ const Home = () => {
 
   const handlePokeTypes = async (e) => {
     const { key } = e;
-    setLoading(true);
-    const res = await fetch(`https://pokeapi.co/api/v2/type/${key}`);
-    const data = await res.json();
-    setAllPokemon(data.pokemon.map((poke) => poke.pokemon));
-    setLoading(false);
-    setIsInfinite(false);
+    if (key === "all") {
+      setPage(1);
+      setSearch("");
+    } else setSearch(`type/${key}`);
   };
-
-  console.log(isInfinite, page);
 
   useEffect(() => {
     getPokemons();
-  }, [page]);
-
-  useEffect(() => {
     window.addEventListener("scroll", handleInfinteScroll);
     return () => window.removeEventListener("scroll", handleInfinteScroll);
-  }, []);
+  }, [page]);
+
+  console.log(page);
+
+  useEffect(() => {
+    getPokemons();
+  }, [search]);
 
   useEffect(() => {
     if (chosenPokemon) {
